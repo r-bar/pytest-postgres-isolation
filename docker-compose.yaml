@@ -1,0 +1,16 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+
+  test:
+    build: .
+    command: [pytest, -n, '4']
+    environment:
+      DBURL: "postgresql://postgres:postgres@postgres:5432/postgres"
+    depends_on:
+      - postgres
