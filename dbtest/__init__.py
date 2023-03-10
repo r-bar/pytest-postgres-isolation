@@ -9,6 +9,7 @@ DBURL = os.environ.get("DBURL", DEFAULT_DBURL)
 engine = sa.create_engine(DBURL)
 
 Base = declarative_base()
+Session = sessionmaker(bind=engine)
 
 
 class User(Base):
@@ -18,9 +19,6 @@ class User(Base):
 
     def __repr__(self):
         return f"User(id={self.id}, name={self.name!r})"
-
-
-Session = sessionmaker(bind=engine)
 
 
 def migrate(engine):

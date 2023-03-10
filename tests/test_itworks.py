@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker, close_all_sessions
 
 @pytest.fixture(scope="session")
 def template():
+    """Ensure the template database exists"""
     from dbtest import engine, migrate
     template_database = 'dbtest_template'
     with engine.connect() as conn:
@@ -32,6 +33,7 @@ def template():
 
 @pytest.fixture
 def engine(template):
+    """Create a new database from the template and return the associated engine"""
     from dbtest import engine
     dbname = "".join(random.choice(string.ascii_lowercase) for _ in range(7))
     url = engine.url._replace(database=dbname)
@@ -51,6 +53,7 @@ def engine(template):
 
 @pytest.fixture
 def session(engine):
+    """Create a new session maker bound to the engine"""
     s = sessionmaker(bind=engine)
     yield s
     close_all_sessions()
@@ -59,6 +62,8 @@ def session(engine):
 
 @pytest.mark.parametrize("i", range(10))
 def test_main(i, session):
+    """Run a test asserting that main creates its users in addition to the users
+    inherited from the template"""
     from dbtest import main, User
     main(session)
     user_count = session().execute(sa.select(sa.func.count(User.id))).scalar()
